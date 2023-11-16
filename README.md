@@ -12,7 +12,7 @@ Node.js and npm (Node Package Manager) should be installed on your machine. You 
 
 ## Installing & Running
 
-**Keep in mind that you have to run the backend first, for instructions on doing that visit [NodeBackend](/)**
+**Keep in mind that you have to run the backend first, for instructions on doing that visit [NodeBackend](https://github.com/FarisRizvanovic/TactaInternship-NodeBackend)**
 
 1. Clone the repository to your local machine:
 

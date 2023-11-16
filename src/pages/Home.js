@@ -15,9 +15,6 @@ const Home = () => {
     "Egg",
   ]);
 
-  const [zoneOne, setZoneOne] = useState([""]);
-  const [zoneTwo, setZoneTwo] = useState([""]);
-
   const handleOnDrag = (e, newItem) => {
     e.dataTransfer.setData("newItem", newItem);
   };
