@@ -7,20 +7,14 @@ import {
   deleteShopper,
   getShoppersWithItemsForUser,
 } from "../api/Shoppers";
-import {
-  addItem,
-  addShopperToItem,
-  deleteItem,
-  deleteShopperFromItem,
-  getItemsForUser,
-} from "../api/Items";
+import { addShopperToItem } from "../api/Items";
 import ItemCard from "../components/ItemCard";
 import toast from "react-hot-toast";
 import AddModal from "../components/ModalDialogs/AddModal";
-
 import { MdDeleteOutline } from "react-icons/md";
 import useDragAndDrop from "../utils/useDragAndDrop";
 import useItems from "../utils/useItems";
+import InformationModal from "../components/ModalDialogs/InformationModal";
 
 const Home = () => {
   const { handleDragOver, handleOnDrag, handleOnDrop } = useDragAndDrop();
@@ -39,6 +33,7 @@ const Home = () => {
   const [addUserModalVisible, setAddUserModalVisible] = useState(false);
   const [addShopperModalVisible, setAddShopperModalVisible] = useState(false);
   const [addItemModalVisible, setAddItemModalVisible] = useState(false);
+  const [InformationModalVisible, setInformationModalVisible] = useState(false);
 
   useEffect(() => {
     if (selectedUser) {
@@ -105,14 +100,26 @@ const Home = () => {
       <div className="min-h-screen">
         {/* USERS */}
         <div className="bg-red-50 h-[30vh] py-5 ">
-          <div className="flex justify-center  items-center gap-2">
+          <div className="flex justify-center w-full   items-center gap-2">
             <h2 className="text-xl font-bold text-center">Users</h2>
-            <button
-              onClick={() => setAddUserModalVisible(true)}
-              className="bg-green-400 text-white font-bold px-2 py-1 rounded-md hover:bg-green-300"
+            <div
+              className="flex gap-4
+            "
             >
-              Click to ADD
-            </button>
+              <button
+                onClick={() => setAddUserModalVisible(true)}
+                className="bg-green-400 text-white font-bold px-2 py-1 rounded-md hover:bg-green-300"
+              >
+                Click to ADD
+              </button>
+
+              <button
+                onClick={() => setInformationModalVisible(true)}
+                className="bg-red-400 text-white font-bold px-2 py-1 rounded-md hover:bg-red-300"
+              >
+                READ ME FIRST
+              </button>
+            </div>
           </div>
           <div className="flex gap-4 overflow-auto  py-4 px-10">
             {users &&
@@ -226,6 +233,11 @@ const Home = () => {
           setModalVisible={setAddItemModalVisible}
           onAdd={handleAddItemWrapper}
         />
+      )}
+
+      {/* MODAL FOR INFORMATION */}
+      {InformationModalVisible && (
+        <InformationModal setModalVisible={setInformationModalVisible} />
       )}
     </>
   );
