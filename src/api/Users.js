@@ -11,3 +11,9 @@ export const addUser = async (name) => {
 
   return response;
 };
+
+export const deleteUser = async (userId) => {
+  const response = await axiosInstance.delete(`/users/${userId}`);
+
+  return response;
+};

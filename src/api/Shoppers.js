@@ -9,3 +9,8 @@ export const addShopper = async (name, userId) => {
   const response = await axiosInstance.post(`/shoppers`, { name, userId });
   return response;
 };
+
+export const deleteShopper = async (shopperId) => {
+  const response = await axiosInstance.delete(`/shoppers/${shopperId}`);
+  return response;
+};

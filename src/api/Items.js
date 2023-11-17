@@ -19,3 +19,8 @@ export const addItem = async (name, userId) => {
   const response = await axiosInstance.post("/items", { name, userId });
   return response;
 };
+
+export const deleteItem = async (itemId) => {
+  const response = await axiosInstance.delete(`/items/${itemId}`);
+  return response;
+};
