@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getUsers } from "../api/Users";
+import { addUser, deleteUser, getUsers } from "../api/Users";
+import toast from "react-hot-toast";
 
 const useUsers = () => {
   const [users, setUsers] = useState(null);
@@ -9,6 +10,24 @@ const useUsers = () => {
   useEffect(() => {
     handleGetUsers();
   }, []);
+
+  const handleAddUser = async (name) => {
+    try {
+      await addUser(name);
+      refreshUsersData();
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    try {
+      await deleteUser(userId);
+      refreshUsersData();
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
 
   const handleGetUsers = async () => {
     setUsersLoading(true);
@@ -26,7 +45,14 @@ const useUsers = () => {
     handleGetUsers();
   };
 
-  return { users, usersLoading, usersError, refreshUsersData };
+  return {
+    users,
+    usersLoading,
+    usersError,
+    refreshUsersData,
+    handleAddUser,
+    handleDeleteUser,
+  };
 };
 
 export default useUsers;

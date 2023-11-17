@@ -17,22 +17,38 @@ import {
 import ItemCard from "../components/ItemCard";
 import toast from "react-hot-toast";
 import AddModal from "../components/ModalDialogs/AddModal";
-import { addUser, deleteUser } from "../api/Users";
+
 import { MdDeleteOutline } from "react-icons/md";
+import useDragAndDrop from "../utils/useDragAndDrop";
+import useItems from "../utils/useItems";
 
 const Home = () => {
-  const { users, refreshUsersData } = useUsers();
+  const { handleDragOver, handleOnDrag, handleOnDrop } = useDragAndDrop();
+  const {
+    currentItems,
+    getItems,
+    handleItemDelete,
+    handleDeleteItem,
+    handleAddItem,
+  } = useItems();
+  const { users, handleAddUser, handleDeleteUser } = useUsers();
+
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentShoppers, setCurrentShoppers] = useState(null);
-  const [currentItems, setCurrentItems] = useState(null);
 
   const [addUserModalVisible, setAddUserModalVisible] = useState(false);
   const [addShopperModalVisible, setAddShopperModalVisible] = useState(false);
   const [addItemModalVisible, setAddItemModalVisible] = useState(false);
 
+  useEffect(() => {
+    if (selectedUser) {
+      getShoppers();
+      getItems(selectedUser);
+    }
+  }, [selectedUser]);
+
   const getShoppers = async () => {
     try {
-      console.log(selectedUser._id);
       const res = await getShoppersWithItemsForUser(selectedUser._id);
       setCurrentShoppers(res.data.data.shoppers);
     } catch (error) {
@@ -40,61 +56,20 @@ const Home = () => {
     }
   };
 
-  const getItems = async () => {
-    try {
-      const res = await getItemsForUser(selectedUser._id);
-      setCurrentItems(res.data.data.items);
-      // console.log(res.data.data.items);
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
-  };
-
-  useEffect(() => {
-    if (selectedUser) {
-      getShoppers();
-      getItems();
-    }
-  }, [selectedUser]);
-
-  const handleOnDrag = (e, itemId) => {
-    e.dataTransfer.setData("itemId", itemId);
-  };
-
-  const handleOnDrop = (e, shopperId) => {
-    const itemId = e.dataTransfer.getData("itemId");
-
-    addItemToShopper(shopperId, itemId);
-  };
-
   const addItemToShopper = async (shopperId, itemId) => {
     try {
       await addShopperToItem(itemId, shopperId);
       getShoppers();
-      getItems();
+      getItems(selectedUser);
     } catch (error) {
       toast.error(error.response.data.message);
     }
   };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const handleItemDelete = async (itemId, shopperId) => {
+  const handleDeleteShopper = async (shopperId) => {
     try {
-      await deleteShopperFromItem(itemId, shopperId);
+      await deleteShopper(shopperId);
       getShoppers();
-      getItems();
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
-  };
-
-  const handleAddUser = async (name) => {
-    try {
-      await addUser(name);
-      refreshUsersData();
+      getItems(selectedUser);
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -109,42 +84,20 @@ const Home = () => {
     }
   };
 
-  const handleAddItem = async (name) => {
-    try {
-      await addItem(name, selectedUser._id);
-      getItems();
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
+  const handleAddItemWrapper = async (name) => {
+    await handleAddItem(name, selectedUser);
   };
 
-  const handleDeleteItem = async (itemId) => {
-    try {
-      await deleteItem(itemId);
-      getItems();
-      getShoppers();
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
+  const handleDeleteItemWrapper = async (itemId) => {
+    await handleDeleteItem(itemId);
+    await getShoppers();
+    await getItems(selectedUser);
   };
 
-  const handleDeleteShopper = async (shopperId) => {
-    try {
-      await deleteShopper(shopperId);
-      getShoppers();
-      getItems();
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
-  };
-
-  const handleDeleteUser = async (userId) => {
-    try {
-      await deleteUser(userId);
-      refreshUsersData();
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
+  const deleteItemWrapper = async (itemId, shopperId) => {
+    await handleItemDelete(itemId, shopperId, getShoppers);
+    await getShoppers();
+    await getItems(selectedUser);
   };
 
   return (
@@ -201,13 +154,15 @@ const Home = () => {
                   <div
                     key={shopper._id}
                     className="w-fit h-fit relative"
-                    onDrop={(e) => handleOnDrop(e, shopper._id)}
+                    onDrop={(e) =>
+                      handleOnDrop(e, shopper._id, addItemToShopper)
+                    }
                     onDragOver={(e) => handleDragOver(e)}
                   >
                     <ShopperCard
                       name={shopper.name}
                       items={shopper.items}
-                      onDelete={handleItemDelete}
+                      onDelete={deleteItemWrapper}
                       shopperId={shopper._id}
                     />
                     <MdDeleteOutline
@@ -241,7 +196,7 @@ const Home = () => {
                   >
                     <ItemCard item={item.name} active={item.active} />
                     <MdDeleteOutline
-                      onClick={() => handleDeleteItem(item._id)}
+                      onClick={() => handleDeleteItemWrapper(item._id)}
                       className="absolute cursor-pointer -top-1.5 border-[1px] border-white -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full p-0.5"
                     />
                   </div>
@@ -269,7 +224,7 @@ const Home = () => {
         <AddModal
           title={"Add Item"}
           setModalVisible={setAddItemModalVisible}
-          onAdd={handleAddItem}
+          onAdd={handleAddItemWrapper}
         />
       )}
     </>

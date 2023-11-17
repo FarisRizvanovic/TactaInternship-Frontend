@@ -1,16 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getShoppersWithItemsForUser } from "../api/Shoppers";
 
-const useShoppers = (userId) => {
-  const [shopperss, setShoppers] = useState(null);
+const useShoppers = () => {
+  const [shoppers, setShoppers] = useState(null);
   const [shoppersLoading, setShoppersLoading] = useState(false);
   const [shoppersError, setShoppersError] = useState(null);
 
-  useEffect(() => {
-    handleGetShoppers();
-  }, []);
-
-  const handleGetShoppers = async () => {
+  const getShoppers = async (userId) => {
     setShoppersLoading(true);
     try {
       const response = await getShoppersWithItemsForUser(userId);
@@ -22,11 +18,7 @@ const useShoppers = (userId) => {
     }
   };
 
-  const refreshShoppersData = async () => {
-    handleGetShoppers();
-  };
-
-  return { shopperss, shoppersLoading, shoppersError, refreshShoppersData };
+  return { getShoppers, shoppers, shoppersLoading, shoppersError };
 };
 
 export default useShoppers;
