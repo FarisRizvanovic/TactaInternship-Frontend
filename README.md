@@ -46,3 +46,4 @@ npm start
 - **src/components:** Contains React components used in the application.
 - **src/api:** Indludes the Axios implementation for communicating with the api.
 - **src/pages:** List of pages.
+- **src/utils:** Utils, custom hooks
